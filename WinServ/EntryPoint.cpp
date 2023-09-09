@@ -5,27 +5,25 @@
 #include "WinService.h"
 #pragma endregion
 
-
 // Settings of the service
 
 // Internal name of the service
-#define SERVICE_NAME             L"SampleWindowsService"
+#define SERVICE_NAME L"SampleWindowsService"
 
 // Displayed name of the service
-#define SERVICE_DISPLAY_NAME     L"Sample Windows Service"
+#define SERVICE_DISPLAY_NAME L"Sample Windows Service"
 
 // Service start options.
-#define SERVICE_START_TYPE       SERVICE_DEMAND_START
+#define SERVICE_START_TYPE SERVICE_DEMAND_START
 
 // List of service dependencies
-#define SERVICE_DEPENDENCIES     L""
+#define SERVICE_DEPENDENCIES L""
 
 // The name of the account under which the service should run
-#define SERVICE_ACCOUNT          L"LocalSystem"
+#define SERVICE_ACCOUNT L"LocalSystem"
 
 // The password to the service account name
-#define SERVICE_PASSWORD         NULL
-
+#define SERVICE_PASSWORD NULL
 
 /*
  *   Install the current application as a service to the local service
@@ -41,14 +39,14 @@
  *   separated names of services or load ordering groups that the system
  *   must start before this service.
  *   @param pszAccount - the name of the account under which the service runs.
- *   @param pszPassword - the password to the account name. 
+ *   @param pszPassword - the password to the account name.
  */
 void InstallService(PWSTR pszServiceName,
-    PWSTR pszDisplayName,
-    DWORD dwStartType,
-    PWSTR pszDependencies,
-    PWSTR pszAccount,
-    PWSTR pszPassword)
+                    PWSTR pszDisplayName,
+                    DWORD dwStartType,
+                    PWSTR pszDependencies,
+                    PWSTR pszAccount,
+                    PWSTR pszPassword)
 {
     wchar_t szPath[MAX_PATH];
     SC_HANDLE schSCManager = NULL;
@@ -61,8 +59,7 @@ void InstallService(PWSTR pszServiceName,
     }
 
     // Open the local default service control manager database
-    schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT |
-        SC_MANAGER_CREATE_SERVICE);
+    schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE);
     if (schSCManager == NULL)
     {
         wprintf(L"OpenSCManager failed w/err 0x%08lx\n", GetLastError());
@@ -71,19 +68,19 @@ void InstallService(PWSTR pszServiceName,
 
     // Install the service into SCM by calling CreateService
     schService = CreateService(
-        schSCManager,                   // SCManager database
-        pszServiceName,                 // Name of service
-        pszDisplayName,                 // Name to display
-        SERVICE_QUERY_STATUS,           // Desired access
-        SERVICE_WIN32_OWN_PROCESS,      // Service type
-        dwStartType,                    // Service start type
-        SERVICE_ERROR_NORMAL,           // Error control type
-        szPath,                         // Service's binary
-        NULL,                           // No load ordering group
-        NULL,                           // No tag identifier
-        pszDependencies,                // Dependencies
-        pszAccount,                     // Service running account
-        pszPassword                     // Password of the account
+        schSCManager,              // SCManager database
+        pszServiceName,            // Name of service
+        pszDisplayName,            // Name to display
+        SERVICE_QUERY_STATUS,      // Desired access
+        SERVICE_WIN32_OWN_PROCESS, // Service type
+        dwStartType,               // Service start type
+        SERVICE_ERROR_NORMAL,      // Error control type
+        szPath,                    // Service's binary
+        NULL,                      // No load ordering group
+        NULL,                      // No tag identifier
+        pszDependencies,           // Dependencies
+        pszAccount,                // Service running account
+        pszPassword                // Password of the account
     );
     if (schService == NULL)
     {
@@ -107,13 +104,12 @@ Cleanup:
     }
 }
 
-
 /*
- *   Stop and remove the service from the local service control 
- *   manager database. If the function fails to uninstall the service, 
+ *   Stop and remove the service from the local service control
+ *   manager database. If the function fails to uninstall the service,
  *   it prints the error in the standard output stream.
  *
- *   @param pszServiceName - the name of the service to be removed.   
+ *   @param pszServiceName - the name of the service to be removed.
  */
 void UninstallService(PWSTR pszServiceName)
 {
@@ -130,8 +126,7 @@ void UninstallService(PWSTR pszServiceName)
     }
 
     // Open the service with delete, stop, and query status permissions
-    schService = OpenService(schSCManager, pszServiceName, SERVICE_STOP |
-        SERVICE_QUERY_STATUS | DELETE);
+    schService = OpenService(schSCManager, pszServiceName, SERVICE_STOP | SERVICE_QUERY_STATUS | DELETE);
     if (schService == NULL)
     {
         wprintf(L"OpenService failed w/err 0x%08lx\n", GetLastError());
@@ -151,7 +146,8 @@ void UninstallService(PWSTR pszServiceName)
                 wprintf(L".");
                 Sleep(1000);
             }
-            else break;
+            else
+                break;
         }
 
         if (ssSvcStatus.dwCurrentState == SERVICE_STOPPED)
@@ -194,26 +190,26 @@ Cleanup:
  *   @param  argv: array of command line arguments
  *   @return none
  */
-int wmain(int argc, wchar_t* argv[])
+int wmain(int argc, wchar_t *argv[])
 {
     if ((argc > 1) && ((*argv[1] == L'-' || (*argv[1] == L'/'))))
     {
         if (_wcsicmp(L"install", argv[1] + 1) == 0)
         {
-            // Install the service when the command is 
+            // Install the service when the command is
             // "-install" or "/install".
             InstallService(
-                const_cast<PWSTR>(SERVICE_NAME),               // Name of service
-                const_cast<PWSTR>(SERVICE_DISPLAY_NAME),       // Name to display
-                SERVICE_START_TYPE,         // Service start type
-                const_cast<PWSTR>(SERVICE_DEPENDENCIES),       // Dependencies
-                const_cast<PWSTR>(SERVICE_ACCOUNT),            // Service running account
-                SERVICE_PASSWORD            // Password of the account
+                const_cast<PWSTR>(SERVICE_NAME),         // Name of service
+                const_cast<PWSTR>(SERVICE_DISPLAY_NAME), // Name to display
+                SERVICE_START_TYPE,                      // Service start type
+                const_cast<PWSTR>(SERVICE_DEPENDENCIES), // Dependencies
+                const_cast<PWSTR>(SERVICE_ACCOUNT),      // Service running account
+                SERVICE_PASSWORD                         // Password of the account
             );
         }
         else if (_wcsicmp(L"remove", argv[1] + 1) == 0)
         {
-            // Uninstall the service when the command is 
+            // Uninstall the service when the command is
             // "-remove" or "/remove".
             UninstallService(const_cast<PWSTR>(SERVICE_NAME));
         }

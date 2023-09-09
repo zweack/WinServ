@@ -2,18 +2,17 @@
 
 #include "ServiceBase.h"
 
-
 class WinService : public ServiceBase
 {
 public:
     WinService(PWSTR pszServiceName,
-        BOOL fCanStop = TRUE,
-        BOOL fCanShutdown = TRUE,
-        BOOL fCanPauseContinue = FALSE);
+               BOOL fCanStop = TRUE,
+               BOOL fCanShutdown = TRUE,
+               BOOL fCanPauseContinue = FALSE);
     virtual ~WinService(void);
 
 protected:
-    virtual void OnStart(DWORD dwArgc, LPWSTR* pszArgv);
+    virtual void OnStart(DWORD dwArgc, LPWSTR *pszArgv);
     virtual void OnStop();
     void ServiceWorkerThread(void);
 

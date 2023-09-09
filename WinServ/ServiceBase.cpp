@@ -4,12 +4,10 @@
 #include <strsafe.h>
 #pragma endregion
 
-
 #pragma region Static Members
 
 // Initialize the singleton service instance.
-ServiceBase* ServiceBase::s_service = NULL;
-
+ServiceBase *ServiceBase::s_service = NULL;
 
 /**
  *   Register the executable for a service with the Service Control
@@ -24,32 +22,30 @@ ServiceBase* ServiceBase::s_service = NULL;
  *   function fails, the return value is FALSE. To get extended error
  *   information, call GetLastError.
  */
-BOOL ServiceBase::Run(ServiceBase& service)
+BOOL ServiceBase::Run(ServiceBase &service)
 {
     s_service = &service;
 
     SERVICE_TABLE_ENTRY serviceTable[] =
-    {
-        { service.m_name, ServiceMain },
-        { NULL, NULL }
-    };
+        {
+            {service.m_name, ServiceMain},
+            {NULL, NULL}};
 
-    // Connects the main thread of a service process to the service control 
-    // manager, which causes the thread to be the service control dispatcher 
-    // thread for the calling process. This call returns when the service has 
+    // Connects the main thread of a service process to the service control
+    // manager, which causes the thread to be the service control dispatcher
+    // thread for the calling process. This call returns when the service has
     // stopped. The process should simply terminate when the call returns.
     return StartServiceCtrlDispatcher(serviceTable);
 }
 
-
 /**
- *   Entry point for the service. It registers the handler function 
+ *   Entry point for the service. It registers the handler function
  *   for the service and starts the service.
- * 
+ *
  *   @param dwArgc: number of command line arguments
  *   @param lpszArgv: array of command line arguments
  */
-void WINAPI ServiceBase::ServiceMain(DWORD dwArgc, PWSTR* pszArgv)
+void WINAPI ServiceBase::ServiceMain(DWORD dwArgc, PWSTR *pszArgv)
 {
     assert(s_service != NULL);
 
@@ -64,7 +60,6 @@ void WINAPI ServiceBase::ServiceMain(DWORD dwArgc, PWSTR* pszArgv)
     // Start the service.
     s_service->Start(dwArgc, pszArgv);
 }
-
 
 /**
  *   This function is called by the SCM whenever a control code is
@@ -90,17 +85,26 @@ void WINAPI ServiceBase::ServiceCtrlHandler(DWORD dwCtrl)
 {
     switch (dwCtrl)
     {
-    case SERVICE_CONTROL_STOP: s_service->Stop(); break;
-    case SERVICE_CONTROL_PAUSE: s_service->Pause(); break;
-    case SERVICE_CONTROL_CONTINUE: s_service->Continue(); break;
-    case SERVICE_CONTROL_SHUTDOWN: s_service->Shutdown(); break;
-    case SERVICE_CONTROL_INTERROGATE: break;
-    default: break;
+    case SERVICE_CONTROL_STOP:
+        s_service->Stop();
+        break;
+    case SERVICE_CONTROL_PAUSE:
+        s_service->Pause();
+        break;
+    case SERVICE_CONTROL_CONTINUE:
+        s_service->Continue();
+        break;
+    case SERVICE_CONTROL_SHUTDOWN:
+        s_service->Shutdown();
+        break;
+    case SERVICE_CONTROL_INTERROGATE:
+        break;
+    default:
+        break;
     }
 }
 
 #pragma endregion
-
 
 #pragma region Service Constructor and Destructor
 
@@ -117,9 +121,9 @@ void WINAPI ServiceBase::ServiceCtrlHandler(DWORD dwCtrl)
  *   @param fCanPauseContinue: the service can be paused and continued
  */
 ServiceBase::ServiceBase(PWSTR pszServiceName,
-    BOOL fCanStop,
-    BOOL fCanShutdown,
-    BOOL fCanPauseContinue)
+                         BOOL fCanStop,
+                         BOOL fCanShutdown,
+                         BOOL fCanPauseContinue)
 {
     // Service name must be a valid string and cannot be NULL.
     m_name = (pszServiceName == NULL) ? const_cast<PWSTR>(L"") : pszServiceName;
@@ -148,9 +152,8 @@ ServiceBase::ServiceBase(PWSTR pszServiceName,
     m_status.dwWaitHint = 0;
 }
 
-
 /**
- *   The virtual destructor of ServiceBase. 
+ *   The virtual destructor of ServiceBase.
  */
 ServiceBase::~ServiceBase(void)
 {
@@ -158,20 +161,19 @@ ServiceBase::~ServiceBase(void)
 
 #pragma endregion
 
-
 #pragma region Service Start, Stop, Pause, Continue, and Shutdown
 
 /*
- *   This function starts the service. It calls the OnStart virtual 
- *   function in which you can specify the actions to take when the service 
- *   starts. If an error occurs during the startup, the error will be logged 
+ *   This function starts the service. It calls the OnStart virtual
+ *   function in which you can specify the actions to take when the service
+ *   starts. If an error occurs during the startup, the error will be logged
  *   in the Application event log, and the service will be stopped.
  *
- *   
+ *
  *   @param dwArgc   - number of command line arguments
  *   @param lpszArgv - array of command line arguments
  */
-void ServiceBase::Start(DWORD dwArgc, PWSTR* pszArgv)
+void ServiceBase::Start(DWORD dwArgc, PWSTR *pszArgv)
 {
     try
     {
@@ -202,7 +204,6 @@ void ServiceBase::Start(DWORD dwArgc, PWSTR* pszArgv)
     }
 }
 
-
 /**
  *   When implemented in a derived class, executes when a Start
  *   command is sent to the service by the SCM or when the operating system
@@ -215,15 +216,14 @@ void ServiceBase::Start(DWORD dwArgc, PWSTR* pszArgv)
  *   @param dwArgc   - number of command line arguments
  *   @param lpszArgv - array of command line arguments
  */
-void ServiceBase::OnStart(DWORD dwArgc, PWSTR* pszArgv)
+void ServiceBase::OnStart(DWORD dwArgc, PWSTR *pszArgv)
 {
 }
 
-
 /**
- *   This function stops the service. It calls the OnStop virtual 
- *   function in which you can specify the actions to take when the service 
- *   stops. If an error occurs, the error will be logged in the Application 
+ *   This function stops the service. It calls the OnStop virtual
+ *   function in which you can specify the actions to take when the service
+ *   stops. If an error occurs, the error will be logged in the Application
  *   event log, and the service will be restored to the original state.
  */
 void ServiceBase::Stop()
@@ -258,26 +258,24 @@ void ServiceBase::Stop()
     }
 }
 
-
 /**
- *   When implemented in a derived class, executes when a Stop 
- *   command is sent to the service by the SCM. Specifies actions to take 
- *   when a service stops running. Be sure to periodically call 
- *   ServiceBase::SetServiceStatus() with SERVICE_STOP_PENDING if the 
- *   procedure is going to take long time. 
+ *   When implemented in a derived class, executes when a Stop
+ *   command is sent to the service by the SCM. Specifies actions to take
+ *   when a service stops running. Be sure to periodically call
+ *   ServiceBase::SetServiceStatus() with SERVICE_STOP_PENDING if the
+ *   procedure is going to take long time.
  */
 void ServiceBase::OnStop()
 {
 }
 
-
 /**
- *   This function pauses the service if the service supports pause 
- *   and continue. It calls the OnPause virtual function in which you can 
- *   specify the actions to take when the service pauses. If an error occurs, 
- *   the error will be logged in the Application event log, and the service 
+ *   This function pauses the service if the service supports pause
+ *   and continue. It calls the OnPause virtual function in which you can
+ *   specify the actions to take when the service pauses. If an error occurs,
+ *   the error will be logged in the Application event log, and the service
  *   will become running.
- *   
+ *
  *   @param: none
  */
 void ServiceBase::Pause()
@@ -311,26 +309,24 @@ void ServiceBase::Pause()
     }
 }
 
-
 /**
- *   When implemented in a derived class, executes when a Pause 
- *   command is sent to the service by the SCM. Specifies actions to take 
+ *   When implemented in a derived class, executes when a Pause
+ *   command is sent to the service by the SCM. Specifies actions to take
  *   when a service pauses.
- * 
+ *
  *   @param: none
  */
 void ServiceBase::OnPause()
 {
 }
 
-
 /**
  *   This function resumes normal functioning after being paused if
- *   the service supports pause and continue. It calls the OnContinue virtual 
- *   function in which you can specify the actions to take when the service 
- *   continues. If an error occurs, the error will be logged in the 
+ *   the service supports pause and continue. It calls the OnContinue virtual
+ *   function in which you can specify the actions to take when the service
+ *   continues. If an error occurs, the error will be logged in the
  *   Application event log, and the service will still be paused.
- * 
+ *
  *   @param: none
  */
 void ServiceBase::Continue()
@@ -364,25 +360,23 @@ void ServiceBase::Continue()
     }
 }
 
-
 /**
- *   When implemented in a derived class, OnContinue runs when a 
- *   Continue command is sent to the service by the SCM. Specifies actions to 
+ *   When implemented in a derived class, OnContinue runs when a
+ *   Continue command is sent to the service by the SCM. Specifies actions to
  *   take when a service resumes normal functioning after being paused.
- * 
+ *
  *   @param: none
  */
 void ServiceBase::OnContinue()
 {
 }
 
-
 /**
- *   This function executes when the system is shutting down. It 
- *   calls the OnShutdown virtual function in which you can specify what 
- *   should occur immediately prior to the system shutting down. If an error 
+ *   This function executes when the system is shutting down. It
+ *   calls the OnShutdown virtual function in which you can specify what
+ *   should occur immediately prior to the system shutting down. If an error
  *   occurs, the error will be logged in the Application event log.
- * 
+ *
  *   @param: none
  */
 void ServiceBase::Shutdown()
@@ -407,12 +401,11 @@ void ServiceBase::Shutdown()
     }
 }
 
-
 /**
- *   When implemented in a derived class, executes when the system 
- *   is shutting down. Specifies what should occur immediately prior to the 
+ *   When implemented in a derived class, executes when the system
+ *   is shutting down. Specifies what should occur immediately prior to the
  *   system shutting down.
- * 
+ *
  *   @param: none
  */
 void ServiceBase::OnShutdown()
@@ -421,20 +414,19 @@ void ServiceBase::OnShutdown()
 
 #pragma endregion
 
-
 #pragma region Helper Functions
 
 /**
- *   This function sets the service status and reports the status to 
+ *   This function sets the service status and reports the status to
  *   the SCM.
  *
  *   @param dwCurrentState - the state of the service
  *   @param dwWin32ExitCode - error code to report
  *   @param dwWaitHint - estimated time for pending operation, in milliseconds
-*/
+ */
 void ServiceBase::SetServiceStatus(DWORD dwCurrentState,
-    DWORD dwWin32ExitCode,
-    DWORD dwWaitHint)
+                                   DWORD dwWin32ExitCode,
+                                   DWORD dwWaitHint)
 {
     static DWORD dwCheckPoint = 1;
 
@@ -446,13 +438,13 @@ void ServiceBase::SetServiceStatus(DWORD dwCurrentState,
 
     m_status.dwCheckPoint =
         ((dwCurrentState == SERVICE_RUNNING) ||
-            (dwCurrentState == SERVICE_STOPPED)) ?
-        0 : dwCheckPoint++;
+         (dwCurrentState == SERVICE_STOPPED))
+            ? 0
+            : dwCheckPoint++;
 
     // Report the status of the service to the SCM.
     ::SetServiceStatus(m_statusHandle, &m_status);
 }
-
 
 /**
  *   Log a message to the Application event log.
@@ -467,11 +459,11 @@ void ServiceBase::SetServiceStatus(DWORD dwCurrentState,
  *     EVENTLOG_ERROR_TYPE
  *     EVENTLOG_INFORMATION_TYPE
  *     EVENTLOG_WARNING_TYPE
-*/
+ */
 void ServiceBase::WriteEventLogEntry(const wchar_t pszMessage[], WORD wType)
 {
     HANDLE hEventSource = NULL;
-    LPCWSTR lpszStrings[2] = { NULL, NULL };
+    LPCWSTR lpszStrings[2] = {NULL, NULL};
 
     hEventSource = RegisterEventSource(NULL, m_name);
     if (hEventSource)
@@ -479,33 +471,32 @@ void ServiceBase::WriteEventLogEntry(const wchar_t pszMessage[], WORD wType)
         lpszStrings[0] = m_name;
         lpszStrings[1] = pszMessage;
 
-        ReportEvent(hEventSource,  // Event log handle
-            wType,                 // Event type
-            0,                     // Event category
-            0,                     // Event identifier
-            NULL,                  // No security identifier
-            2,                     // Size of lpszStrings array
-            0,                     // No binary data
-            lpszStrings,           // Array of strings
-            NULL                   // No binary data
+        ReportEvent(hEventSource, // Event log handle
+                    wType,        // Event type
+                    0,            // Event category
+                    0,            // Event identifier
+                    NULL,         // No security identifier
+                    2,            // Size of lpszStrings array
+                    0,            // No binary data
+                    lpszStrings,  // Array of strings
+                    NULL          // No binary data
         );
 
         DeregisterEventSource(hEventSource);
     }
 }
 
-
 /**
  *   Log an error message to the Application event log.
  *
  *   @param pszFunction - the function that gives the error
  *   @param dwError - the error code
-*/
+ */
 void ServiceBase::WriteErrorLogEntry(const wchar_t pszFunction[], DWORD dwError)
 {
     wchar_t szMessage[260];
     StringCchPrintf(szMessage, ARRAYSIZE(szMessage),
-        L"%s failed w/err 0x%08lx", pszFunction, dwError);
+                    L"%s failed w/err 0x%08lx", pszFunction, dwError);
     WriteEventLogEntry(szMessage, EVENTLOG_ERROR_TYPE);
 }
 
